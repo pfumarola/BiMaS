@@ -21,6 +21,7 @@ exports.postBikeInfo = (req, res, next) => {
     traveledKM: req.body.km
   });
   bike.update();
+  /*
   if(req.body.docked !== ""){
     if(Station.exists(req.params.docked))
       bike.dock(req.body.docked);
@@ -32,19 +33,25 @@ exports.postBikeInfo = (req, res, next) => {
   else{
     bike.undock();
   }
+  */
   res.status(201).json({
     message: 'Bike info update.',
-    BikeId: bikeId
+    bikeId: bikeId
   });
 }
 
 exports.getBikeInfo = (req, res, next) => {
   const bikeId = req.params.id;
-  const status = Bike.status(bikeId);
-  if(status.id)
-    return res.status(200).json(status);
-
-  res.status(404).json({
-    message: 'Bike with id '+bikeId+' not found',
-  });
+  Bike.status(bikeId)
+  .then(status =>{
+    console.log(status);
+    if(status.id)
+      return res.status(200).json(status);
+    res.status(404).json({
+      message: 'Bike with id '+bikeId+' not found',
+    });
+  })
+  .catch(error =>{
+    res.status(error.status).json(error);
+  })
 }

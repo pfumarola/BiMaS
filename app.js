@@ -2,6 +2,9 @@ const http = require('http');
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const helmet = require('helmet');
+
+const connectDB = require('./utils/database').connectDB;
 
 const app = express();
 
@@ -17,6 +20,9 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(helmet());
+
+//Security header
 app.use(bodyParser.json());
 
 app.use(bikeRoutes);
@@ -27,5 +33,10 @@ app.use(errorController.get404);
 app.use((error, req, res, next) =>{
   res.status(error.httpStatusCode).send("Errore");
 })
-
-app.listen(3000);
+console.log("Server is starting...");
+setTimeout(()=>{
+  connectDB( () =>{
+    app.listen(3000);
+    console.log('Server started on port', process.env.PORT || 3000);
+  })
+}, 1000);
